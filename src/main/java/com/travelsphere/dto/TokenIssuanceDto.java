@@ -1,6 +1,6 @@
 package com.travelsphere.dto;
 
-import com.travelsphere.enums.UserStatus.UserRole;
+import com.travelsphere.enums.UserRole;
 import lombok.Builder;
 import lombok.Getter;
 
