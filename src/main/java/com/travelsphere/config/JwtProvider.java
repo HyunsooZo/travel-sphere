@@ -1,7 +1,7 @@
 package com.travelsphere.config;
 
 import com.travelsphere.dto.TokenIssuanceDto;
-import com.travelsphere.enums.UserStatus.UserRole;
+import com.travelsphere.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

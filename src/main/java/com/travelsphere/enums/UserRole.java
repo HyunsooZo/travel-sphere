@@ -1,4 +1,4 @@
-package com.travelsphere.enums.UserStatus;
+package com.travelsphere.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
