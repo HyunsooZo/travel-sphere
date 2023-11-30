@@ -25,7 +25,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.travelphere"))
+                .apis(RequestHandlerSelectors.basePackage("com.travelsphere"))
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo());
