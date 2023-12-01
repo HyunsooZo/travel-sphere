@@ -3,10 +3,7 @@ package com.travelsphere.domain;
 import com.travelsphere.dto.UserSignUpRequestDto;
 import com.travelsphere.enums.UserRole;
 import com.travelsphere.enums.UserStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -34,9 +31,12 @@ public class User extends BaseEntity {
     private String phone;
 
     @Column
+    @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
     @Column
+    @Setter
+    @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
     public static User from(UserSignUpRequestDto userSignUpRequestDto,

@@ -3,6 +3,7 @@ package com.travelsphere.service;
 import com.travelsphere.domain.User;
 import com.travelsphere.dto.UserDto;
 import com.travelsphere.dto.UserSignUpRequestDto;
+import com.travelsphere.enums.UserStatus;
 import com.travelsphere.exception.CustomException;
 import com.travelsphere.exception.ErrorCode;
 import com.travelsphere.repository.UserRepository;
@@ -11,6 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+
+import static com.travelsphere.enums.UserStatus.ACTIVE;
+import static com.travelsphere.enums.VerificationText.*;
 
 @RequiredArgsConstructor
 @Service
@@ -45,4 +49,43 @@ public class UserService {
 
         return UserDto.from(user);
     }
+
+    /**
+     * 사용자의 이메일을 인증하는 메서드
+     *
+     * @param userId 사용자의 고유 식별자
+     * @return 이메일 인증 완료 메시지
+     * @throws CustomException 사용자 정보를 찾을 수 없을 때 발생하는 예외
+     */
+    @Transactional
+    public String verifyEmail(Long userId) {
+        User user = getUser(userId);
+        UserStatus userStatus = user.getUserStatus();
+
+        if (userStatus.equals(ACTIVE)) {
+            return ALREADY_VERIFIED;
+        }
+
+        if (userStatus.equals(UserStatus.INACTIVE)) {
+            return DELETED_USER;
+        }
+
+        user.setUserStatus(ACTIVE);
+
+        return VERIFIED ;
+    }
+
+    /**
+     * 사용자 정보를 조회하는 내부 메서드
+     *
+     * @param userId 사용자의 고유 식별자
+     * @return 주어진 식별자에 해당하는 사용자 정보
+     * @throws CustomException 사용자 정보를 찾을 수 없을 때 발생하는 예외
+     */
+    private User getUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INFO_NOT_FOUND)
+        );
+    }
+
 }
