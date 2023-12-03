@@ -1,5 +1,6 @@
 package com.travelsphere.service;
 
+import com.travelsphere.config.JwtProvider;
 import com.travelsphere.domain.User;
 import com.travelsphere.enums.UserRole;
 import com.travelsphere.enums.UserStatus;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -25,12 +27,20 @@ class UserVerificationServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private JwtProvider jwtProvider;
+
+    @Mock
+    private StringRedisTemplate redisTemplate;
+
     private UserService userService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        userService = new UserService(userRepository, passwordEncoder);
+        userService = new UserService(
+                userRepository, passwordEncoder, jwtProvider, redisTemplate
+        );
     }
 
     static User user = User.builder()
