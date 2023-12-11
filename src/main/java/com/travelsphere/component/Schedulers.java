@@ -3,15 +3,19 @@ package com.travelsphere.component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.travelsphere.domain.Weather;
-import com.travelsphere.enums.Countries;
+import com.travelsphere.enums.Cities;
 import com.travelsphere.repository.WeatherRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,6 +24,7 @@ public class Schedulers {
     private final WeatherRepository weatherRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final CacheManager cacheManager;
 
     @Value("${external-api.weather.url}")
     private String externalApiUrl;
@@ -33,27 +38,29 @@ public class Schedulers {
     @Scheduled(cron = "0 0 */3 * * *")
     @Transactional
     public void getWeatherInfo() {
-        Countries.all.forEach((country, cities) -> {
-            cities.forEach(city -> {
+        Arrays.stream(Cities.values()).forEach(city -> {
 
-                String url = String.format(externalApiUrl, city, externalApiKey);
+            String url = String.format(externalApiUrl, city.getCityName(), externalApiKey);
 
-                String response = callApi(url);
+            String response = callApi(url);
 
-                Weather weather = jsonParser(country, city, response);
+            Weather weather = jsonParser(
+                    city.getCountryName(), city.getCityName(), response
+            );
 
-                if (weather != null) {
-                    weatherRepository.save(weather);
-                }
-            });
+            if (weather != null) {
+                weatherRepository.save(weather);
+                log.info("weather info save success : {}", weather.getCityName());
+                evictCityWeatherCache(city.getCityName());
+            }
         });
+        evictCityWeatherCache(Cities.ALL.getCityName());
     }
-
 
     /**
      * 외부 API로부터 받은 JSON 데이터를 파싱
      *
-     * @param city    도시명
+     * @param city     도시명
      * @param response 외부 API로부터 받은 JSON 데이터
      * @return Weather
      */
@@ -86,6 +93,7 @@ public class Schedulers {
 
     /**
      * 켈빈 온도를 섭씨 온도로 변환
+     *
      * @param temperatureKelvin 켈빈 온도
      * @return 섭씨 온도
      */
@@ -101,5 +109,17 @@ public class Schedulers {
      */
     private String callApi(String url) {
         return restTemplate.getForObject(url, String.class);
+    }
+
+    /**
+     * 특정도시의 날씨정보 캐시 삭제
+     *
+     * @param cityName 도시이름
+     */
+    public void evictCityWeatherCache(String cityName) {
+        Cache weatherCache = cacheManager.getCache("weather");
+        if (weatherCache != null) {
+            weatherCache.evict("weather_of:" + cityName);
+        }
     }
 }
