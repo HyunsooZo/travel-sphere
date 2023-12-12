@@ -20,17 +20,17 @@ import java.util.Arrays;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class Schedulers {
+public class WeatherScheduler {
     private final WeatherRepository weatherRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final CacheManager cacheManager;
 
     @Value("${external-api.weather.url}")
-    private String externalApiUrl;
+    private String weatherApiUrl;
 
     @Value("${external-api.weather.key}")
-    private String externalApiKey;
+    private String weatherApiKey;
 
     /**
      * 매 시간마다 날씨정보를 가져와서 DB에 저장
@@ -39,8 +39,11 @@ public class Schedulers {
     @Transactional
     public void getWeatherInfo() {
         Arrays.stream(Cities.values()).forEach(city -> {
+            if(city == Cities.ALL) {
+                return;
+            }
 
-            String url = String.format(externalApiUrl, city.getCityName(), externalApiKey);
+            String url = String.format(weatherApiUrl, city.getCityName(), weatherApiKey);
 
             String response = callApi(url);
 
