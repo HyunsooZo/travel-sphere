@@ -8,8 +8,9 @@ import com.travelsphere.repository.ExchangeRateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ public class ExchangeRateService {
      * @return 환율 정보
      */
     @Cacheable(value = "exchangeRate", key = "'rate_of:' + #countryName")
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ExchangeRateDto> getExchangeRates(Countries countryName) {
         List<ExchangeRate> list;
         if (countryName.equals(Countries.ALL)) {
@@ -45,10 +46,10 @@ public class ExchangeRateService {
      * @param amount 금액
      * @return 환율 계산 결과
      */
+    @Transactional(readOnly = true)
     public Double convertCurrency(Currencies fromCurrency,
                                   Currencies toCurrency,
                                   double amount) {
-
 
         ExchangeRate exchangeRate =
                 fromCurrency.equals(Currencies.KRW) ?
@@ -66,6 +67,9 @@ public class ExchangeRateService {
             currentUnit = currentUnit / 10;
         }
 
-        return toKrw ? amount * basePrice : amount / basePrice;
+        double result = toKrw ? amount * basePrice : amount / basePrice;
+
+        DecimalFormat df = new DecimalFormat("#.##");
+        return Double.parseDouble(df.format(result));
     }
 }
