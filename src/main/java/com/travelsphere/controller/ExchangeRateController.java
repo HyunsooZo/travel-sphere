@@ -1,8 +1,10 @@
 package com.travelsphere.controller;
 
+import com.travelsphere.dto.ExchangeCalculateResponseDto;
 import com.travelsphere.dto.ExchangeRateDto;
 import com.travelsphere.dto.ExchangeRateResponseDto;
 import com.travelsphere.enums.Countries;
+import com.travelsphere.enums.Currencies;
 import com.travelsphere.service.ExchangeRateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,7 +42,29 @@ public class ExchangeRateController {
         List<ExchangeRateDto> rates =
                 exchangeRateService.getExchangeRates(countryName);
 
-        log.info("done");
         return ResponseEntity.status(OK).body(ExchangeRateResponseDto.from(rates));
+    }
+
+    /**
+     * 환율 계산
+     * @param fromCurrency 입력된 화폐
+     * @param toCurrency 출력할 화폐
+     * @param amount 금액
+     * @param token 토큰
+     * @return 환율 계산 결과
+     */
+    @GetMapping("/from/{fromCurrency}/to/{toCurrency}/amount/{amount}")
+    @ApiOperation(value = "환율 계산", notes = "원화를 외화로(또는 반대로) 계산합니다.")
+    public ResponseEntity<ExchangeCalculateResponseDto> getForeignCurrency(
+            @PathVariable Currencies fromCurrency,
+            @PathVariable Currencies toCurrency,
+            @PathVariable double amount,
+            @RequestHeader(AUTHORIZATION) String token) {
+
+        Double calculatedAmount =
+                exchangeRateService.convertCurrency(fromCurrency, toCurrency, amount);
+
+        return ResponseEntity.status(OK)
+                .body(ExchangeCalculateResponseDto.from(calculatedAmount));
     }
 }
