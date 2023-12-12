@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Getter
@@ -18,7 +16,19 @@ import javax.persistence.Id;
 public class Weather extends BaseEntity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String cityName;
 
+    private String countryName;
+
+    private String weather;
+
+    private String currentTemperature;
+
+    private String minTemperature;
+
+    private String maxTemperature;
+
+    private Double humidity;
+
+    private String feelsLike;
 }
