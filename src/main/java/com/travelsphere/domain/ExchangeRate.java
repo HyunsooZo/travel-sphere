@@ -18,7 +18,17 @@ import javax.persistence.Id;
 public class ExchangeRate extends BaseEntity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String currency;
 
+    private String countryName;
+
+    private Double toBuy;
+
+    private Double toSell;
+
+    private Double basePrice;
+
+    private Integer currentUnit;
+
+    private String time;
 }
