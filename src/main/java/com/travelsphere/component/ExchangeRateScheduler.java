@@ -77,7 +77,6 @@ public class ExchangeRateScheduler {
                 double toBuy = jsonNode.get("cashBuyingPrice").asDouble();
                 double toSell = jsonNode.get("cashSellingPrice").asDouble();
                 int currentUnit = jsonNode.get("currencyUnit").asInt();
-                String countryName = jsonNode.get("country").asText();
 
                 return ExchangeRate.builder()
                         .time(time)
@@ -85,7 +84,7 @@ public class ExchangeRateScheduler {
                         .toBuy(toBuy)
                         .toSell(toSell)
                         .currentUnit(currentUnit)
-                        .countryName(countryName)
+                        .countryName(country.getCountryName())
                         .currency(currencyName)
                         .build();
             }
