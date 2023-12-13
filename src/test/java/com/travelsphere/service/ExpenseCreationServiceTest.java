@@ -66,7 +66,6 @@ class ExpenseCreationServiceTest {
     void createExpense() {
         // given
         ExpenseCreateRequestDto expense = ExpenseCreateRequestDto.builder()
-                .userId(1L)
                 .category(ExpenseCategories.ACTIVITY)
                 .currency(Currencies.MYR)
                 .amount(100.0)
@@ -77,7 +76,7 @@ class ExpenseCreationServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(exchangeRateRepository.findByCurrency("MYR")).thenReturn(List.of(exchangeRate));
         // when
-        expenseService.createExpense(expense);
+        expenseService.createExpense(1L,expense);
         // then
         verify(expenseRepository, times(1)).save(Mockito.any());
     }
