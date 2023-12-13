@@ -1,14 +1,17 @@
 package com.travelsphere.domain;
 
+import com.travelsphere.enums.Cities;
+import com.travelsphere.enums.Currencies;
+import com.travelsphere.enums.ExpenseCategories;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import java.sql.Date;
 
 @Getter
 @AllArgsConstructor
@@ -21,4 +24,22 @@ public class Expense extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Enumerated(EnumType.STRING)
+    private ExpenseCategories category;
+
+    private String currency;
+
+    private Double amount;
+
+    private Double amountOfKrw;
+
+    private Date date;
+
+    private String city;
+
+    private String country;
 }
