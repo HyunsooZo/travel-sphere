@@ -38,7 +38,7 @@ public class ExpenseService {
 
         Double amountOfKrw = amount;
 
-        User user = userRepository.findById(expenseCreateRequestDto.getUserId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_INFO_NOT_FOUND));
 
         if (!currency.equals("KRW"))
