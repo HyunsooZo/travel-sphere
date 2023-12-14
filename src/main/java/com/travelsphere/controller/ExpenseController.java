@@ -4,6 +4,7 @@ import com.travelsphere.config.JwtProvider;
 import com.travelsphere.dto.ExpenseCreateRequestDto;
 import com.travelsphere.dto.ExpenseDto;
 import com.travelsphere.dto.ExpenseInquiryResponseDto;
+import com.travelsphere.dto.ExpenseModificationRequestDto;
 import com.travelsphere.service.ExpenseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,9 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.HttpStatus.*;
 
 @Api(tags = "Expense API", description = "지출 관련 API")
 @RequestMapping("/api/v1/expenses")
@@ -67,5 +67,19 @@ public class ExpenseController {
         Page<ExpenseDto> expenses = expenseService.getExpenses(userId,pageRequest);
 
         return ResponseEntity.status(OK).body(ExpenseInquiryResponseDto.from(expenses));
+    }
+
+    @PatchMapping("/{id}")
+    @ApiOperation(value = "지출 수정", notes = "지출을 수정합니다.")
+    public ResponseEntity<Void> updateExpense(
+            @RequestHeader(AUTHORIZATION) String token,
+            @PathVariable Long id,
+            @Valid @RequestBody ExpenseModificationRequestDto expenseModificationRequestDto) {
+
+        Long userId = jwtProvider.getIdFromToken(token);
+
+        expenseService.updateExpense(userId, id, expenseModificationRequestDto);
+
+        return ResponseEntity.status(NO_CONTENT).build();
     }
 }

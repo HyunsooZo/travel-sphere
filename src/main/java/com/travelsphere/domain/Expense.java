@@ -1,10 +1,7 @@
 package com.travelsphere.domain;
 
 import com.travelsphere.enums.ExpenseCategories;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -24,18 +21,25 @@ public class Expense extends BaseEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private ExpenseCategories category;
 
+    @Setter
     private String currency;
 
+    @Setter
     private Double amount;
 
+    @Setter
     private Double amountOfKrw;
 
+    @Setter
     private Date date;
 
+    @Setter
     private String city;
 
+    @Setter
     private String country;
 }
