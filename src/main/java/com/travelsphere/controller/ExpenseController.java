@@ -1,15 +1,24 @@
 package com.travelsphere.controller;
 
+import com.travelsphere.config.JwtProvider;
 import com.travelsphere.dto.ExpenseCreateRequestDto;
+import com.travelsphere.dto.ExpenseDto;
+import com.travelsphere.dto.ExpenseInquiryResponseDto;
 import com.travelsphere.service.ExpenseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 import javax.validation.Valid;
 
@@ -21,14 +30,47 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RestController
 public class ExpenseController {
     private final ExpenseService expenseService;
+    private final JwtProvider jwtProvider;
 
+    /**
+     * 지출 등록
+     *
+     * @param token jwt 토큰
+     * @param expenseCreateRequestDto 지출 등록 요청 DTO
+     * @return ResponseEntity<Void>
+     */
     @PostMapping
     @ApiOperation(value = "지출 등록", notes = "지출을 등록합니다.")
     public ResponseEntity<Void> createExpense(
+            @RequestHeader(AUTHORIZATION) String token,
             @Valid @RequestBody ExpenseCreateRequestDto expenseCreateRequestDto) {
 
-        expenseService.createExpense(expenseCreateRequestDto);
+        Long userId = jwtProvider.getIdFromToken(token);
+        expenseService.createExpense(userId, expenseCreateRequestDto);
 
         return ResponseEntity.status(CREATED).build();
+    }
+
+    /**
+     * 지출 조회 (페이징)
+     * @param token jwt 토큰
+     * @param page 페이지 번호
+     * @param size 페이지 사이즈
+     * @return ResponseEntity<ExpenseInquiryResponseDto>
+     */
+    @GetMapping
+    @ApiOperation(value = "지출 조회", notes = "지출을 조회합니다.")
+    public ResponseEntity<ExpenseInquiryResponseDto> getExpenses(
+            @RequestHeader(AUTHORIZATION) String token,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+
+        Long userId = jwtProvider.getIdFromToken(token);
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        Page<ExpenseDto> expenses = expenseService.getExpenses(userId,pageRequest);
+
+        return ResponseEntity.status(OK).body(ExpenseInquiryResponseDto.from(expenses));
     }
 }

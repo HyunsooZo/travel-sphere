@@ -1,7 +1,5 @@
 package com.travelsphere.domain;
 
-import com.travelsphere.enums.Cities;
-import com.travelsphere.enums.Currencies;
 import com.travelsphere.enums.ExpenseCategories;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import java.sql.Date;
 
 @Getter

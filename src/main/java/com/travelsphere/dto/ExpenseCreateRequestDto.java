@@ -18,9 +18,6 @@ import java.sql.Date;
 @Builder
 public class ExpenseCreateRequestDto {
 
-    @NotNull(message = "사용자 ID를 입력해주세요.")
-    private Long userId;
-
     @NotNull(message = "카테고리를 입력해주세요.")
     private ExpenseCategories category;
 
