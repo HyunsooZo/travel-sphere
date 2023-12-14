@@ -31,15 +31,15 @@ public class ExpenseService {
     public void createExpense(Long userId,
                               ExpenseCreateRequestDto expenseCreateRequestDto) {
 
+
         Double amount = expenseCreateRequestDto.getAmount();
 
         String currency = expenseCreateRequestDto.getCurrency().getCurrencyName();
 
         Double amountOfKrw = amount;
 
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_INFO_NOT_FOUND)
-        );
+        User user = userRepository.findById(expenseCreateRequestDto.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_INFO_NOT_FOUND));
 
         if (!currency.equals("KRW"))
             amountOfKrw = exchangeRateService.convertCurrency(
@@ -75,4 +75,5 @@ public class ExpenseService {
         );
         return expenseRepository.findAllByUserId(user, pageRequest);
     }
+
 }

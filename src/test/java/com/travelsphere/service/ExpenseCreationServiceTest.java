@@ -77,6 +77,7 @@ class ExpenseCreationServiceTest {
         when(exchangeRateRepository.findByCurrency("MYR")).thenReturn(List.of(exchangeRate));
         // when
         expenseService.createExpense(1L,expense);
+
         // then
         verify(expenseRepository, times(1)).save(Mockito.any());
     }
