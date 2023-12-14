@@ -4,6 +4,7 @@ import com.travelsphere.domain.Expense;
 import com.travelsphere.domain.User;
 import com.travelsphere.dto.ExpenseCreateRequestDto;
 import com.travelsphere.dto.ExpenseDto;
+import com.travelsphere.dto.ExpenseModificationRequestDto;
 import com.travelsphere.enums.Currencies;
 import com.travelsphere.exception.CustomException;
 import com.travelsphere.exception.ErrorCode;
@@ -31,14 +32,13 @@ public class ExpenseService {
     public void createExpense(Long userId,
                               ExpenseCreateRequestDto expenseCreateRequestDto) {
 
-
         Double amount = expenseCreateRequestDto.getAmount();
 
         String currency = expenseCreateRequestDto.getCurrency().getCurrencyName();
 
         Double amountOfKrw = amount;
 
-        User user = userRepository.findById(expenseCreateRequestDto.getUserId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_INFO_NOT_FOUND));
 
         if (!currency.equals("KRW"))
@@ -76,4 +76,58 @@ public class ExpenseService {
         return expenseRepository.findAllByUserId(user, pageRequest);
     }
 
+    /**
+     * 지출을 수정한다.
+     * @param userId 사용자
+     * @param id 지출 id
+     * @param expenseModificationRequestDto 지출 수정 요청 DTO
+     */
+    @Transactional
+    public void updateExpense(Long userId,
+                              Long id,
+                              ExpenseModificationRequestDto expenseModificationRequestDto) {
+
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INFO_NOT_FOUND)
+        );
+
+        Expense expense = expenseRepository.findById(id).orElseThrow(
+                () -> new CustomException(ErrorCode.EXPENSE_NOT_FOUND)
+        );
+
+        if (!expense.getUser().equals(user)) {
+            throw new CustomException(ErrorCode.NOT_MY_EXPENSE);
+        }
+
+        if (expenseModificationRequestDto.getCategory() != null) {
+            expense.setCategory(expenseModificationRequestDto.getCategory());
+        }
+
+        if(expenseModificationRequestDto.getCurrency() != null) {
+            expense.setCurrency(expenseModificationRequestDto.getCurrency().getCurrencyName());
+            expense.setAmountOfKrw(exchangeRateService.convertCurrency(
+                    Currencies.valueOf(expenseModificationRequestDto.getCurrency().getCurrencyName()),
+                    Currencies.KRW,
+                    expense.getAmount()
+            ));
+        }
+
+        if(expenseModificationRequestDto.getAmount() != null) {
+            expense.setAmount(expenseModificationRequestDto.getAmount());
+            expense.setAmountOfKrw(exchangeRateService.convertCurrency(
+                    Currencies.valueOf(expense.getCurrency()),
+                    Currencies.KRW,
+                    expenseModificationRequestDto.getAmount()
+            ));
+        }
+
+        if(expenseModificationRequestDto.getDate() != null) {
+            expense.setDate(expenseModificationRequestDto.getDate());
+        }
+
+        if(expenseModificationRequestDto.getCity() != null) {
+            expense.setCity(expenseModificationRequestDto.getCity().getCityName());
+            expense.setCountry(expenseModificationRequestDto.getCity().getCountryName());
+        }
+    }
 }
