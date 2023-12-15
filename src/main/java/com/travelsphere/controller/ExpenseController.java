@@ -6,6 +6,7 @@ import com.travelsphere.dto.ExpenseDto;
 import com.travelsphere.dto.ExpenseInquiryResponseDto;
 import com.travelsphere.dto.ExpenseModificationRequestDto;
 import com.travelsphere.service.ExpenseService;
+import com.travelsphere.service.StatisticsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import static org.springframework.http.HttpStatus.*;
 @RestController
 public class ExpenseController {
     private final ExpenseService expenseService;
+    private final StatisticsService statisticsService;
     private final JwtProvider jwtProvider;
 
     /**
@@ -42,6 +44,8 @@ public class ExpenseController {
 
         Long userId = jwtProvider.getIdFromToken(token);
         expenseService.createExpense(userId, expenseCreateRequestDto);
+
+        statisticsService.updateStatistics(expenseCreateRequestDto);
 
         return ResponseEntity.status(CREATED).build();
     }
