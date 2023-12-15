@@ -63,7 +63,7 @@ public class ExchangeRateService {
         double basePrice = exchangeRate.getBasePrice();
 
         while (currentUnit > 1) {
-            basePrice = basePrice * 10;
+            basePrice = basePrice / 10;
             currentUnit = currentUnit / 10;
         }
 

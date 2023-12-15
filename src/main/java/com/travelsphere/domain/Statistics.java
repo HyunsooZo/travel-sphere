@@ -1,14 +1,9 @@
 package com.travelsphere.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.travelsphere.enums.ExpenseCategories;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter
 @AllArgsConstructor
@@ -21,4 +16,19 @@ public class Statistics extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
+    private String country;
+
+    @Setter
+    private String city;
+
+    @Setter
+    private Long numberOfExpenses;
+
+    @Setter
+    @Enumerated(EnumType.STRING)
+    private ExpenseCategories category;
+
+    @Setter
+    private Double averageAmountInKrw;
 }
