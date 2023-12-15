@@ -69,6 +69,13 @@ public class ExpenseController {
         return ResponseEntity.status(OK).body(ExpenseInquiryResponseDto.from(expenses));
     }
 
+    /**
+     * 지출 삭제
+     * @param token jwt 토큰
+     * @param id 지출 ID
+     * @param expenseModificationRequestDto 지출 수정 요청 DTO
+     * @return ResponseEntity<Void>
+     */
     @PatchMapping("/{id}")
     @ApiOperation(value = "지출 수정", notes = "지출을 수정합니다.")
     public ResponseEntity<Void> updateExpense(
@@ -79,6 +86,19 @@ public class ExpenseController {
         Long userId = jwtProvider.getIdFromToken(token);
 
         expenseService.updateExpense(userId, id, expenseModificationRequestDto);
+
+        return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @DeleteMapping("/{id}")
+    @ApiOperation(value = "지출 삭제", notes = "지출을 삭제합니다.")
+    public ResponseEntity<Void> deleteExpense(
+            @RequestHeader(AUTHORIZATION) String token,
+            @PathVariable Long id) {
+
+        Long userId = jwtProvider.getIdFromToken(token);
+
+        expenseService.deleteExpense(userId, id);
 
         return ResponseEntity.status(NO_CONTENT).build();
     }
