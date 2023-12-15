@@ -2,11 +2,18 @@ package com.travelsphere.service;
 
 import com.travelsphere.domain.Statistics;
 import com.travelsphere.dto.ExpenseCreateRequestDto;
+import com.travelsphere.dto.StatisticsDto;
+import com.travelsphere.enums.Cities;
 import com.travelsphere.enums.Currencies;
+import com.travelsphere.enums.ExpenseCategories;
 import com.travelsphere.repository.StatisticsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -52,4 +59,10 @@ public class StatisticsService {
         statisticsRepository.save(statistics);
     }
 
+    @Transactional(readOnly = true)
+    public List<StatisticsDto> getStatisticsByCity(Cities cityName) {
+        return statisticsRepository.findByCity(cityName.getCityName()).stream()
+                .map(StatisticsDto::from)
+                .collect(Collectors.toList());
+    }
 }
