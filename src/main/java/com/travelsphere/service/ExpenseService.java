@@ -130,4 +130,25 @@ public class ExpenseService {
             expense.setCountry(expenseModificationRequestDto.getCity().getCountryName());
         }
     }
+
+    /**
+     * 지출을 삭제한다.
+     * @param userId 사용자
+     * @param id 지출 id
+     */
+    public void deleteExpense(Long userId, Long id) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_INFO_NOT_FOUND)
+        );
+
+        Expense expense = expenseRepository.findById(id).orElseThrow(
+                () -> new CustomException(ErrorCode.EXPENSE_NOT_FOUND)
+        );
+
+        if (!expense.getUser().equals(user)) {
+            throw new CustomException(ErrorCode.NOT_MY_EXPENSE);
+        }
+
+        expenseRepository.delete(expense);
+    }
 }
